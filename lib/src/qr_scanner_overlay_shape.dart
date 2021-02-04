@@ -4,17 +4,18 @@ import 'package:flutter/material.dart';
 
 class QrScannerOverlayShape extends ShapeBorder {
   QrScannerOverlayShape({
+    @required this.heightRatio,
     this.borderColor = Colors.red,
     this.borderWidth = 3.0,
-    this.overlayColor = const Color.fromRGBO(0, 0, 0, 80),
+    this.overlayColor,
     this.borderRadius = 0,
     this.borderLength = 40,
     this.cutOutSize = 250,
   }) : assert(
-            cutOutSize != null ??
-                cutOutSize != null ??
-                borderLength <= cutOutSize / 2 + borderWidth * 2,
-            "Border can't be larger than ${cutOutSize / 2 + borderWidth * 2}");
+  cutOutSize != null ??
+      cutOutSize != null ??
+      borderLength <= cutOutSize / 2 + borderWidth * 2,
+  "Border can't be larger than ${cutOutSize / 2 + borderWidth * 2}");
 
   final Color borderColor;
   final double borderWidth;
@@ -22,6 +23,7 @@ class QrScannerOverlayShape extends ShapeBorder {
   final double borderRadius;
   final double borderLength;
   final double cutOutSize;
+  final double heightRatio;
 
   @override
   EdgeInsetsGeometry get dimensions => const EdgeInsets.all(10);
@@ -59,6 +61,7 @@ class QrScannerOverlayShape extends ShapeBorder {
 
   @override
   void paint(Canvas canvas, Rect rect, {TextDirection textDirection}) {
+    final ratio = 359/280;
     final width = rect.width;
     final borderWidthSize = width / 2;
     final height = rect.height;
@@ -66,10 +69,9 @@ class QrScannerOverlayShape extends ShapeBorder {
     final _borderLength = borderLength > cutOutSize / 2 + borderWidth * 2
         ? borderWidthSize / 2
         : borderLength;
-    final _cutOutSize = cutOutSize != null && cutOutSize < width
-        ? cutOutSize
-        : width - borderOffset;
-
+    final _cutOutSize = cutOutSize != null && cutOutSize*ratio < width
+        ? cutOutSize*ratio
+        : width - borderOffset-32;
     final backgroundPaint = Paint()
       ..color = overlayColor
       ..style = PaintingStyle.fill;
@@ -83,12 +85,11 @@ class QrScannerOverlayShape extends ShapeBorder {
       ..color = borderColor
       ..style = PaintingStyle.fill
       ..blendMode = BlendMode.dstOut;
-
     final cutOutRect = Rect.fromLTWH(
-      rect.left + width / 2 - _cutOutSize / 2 + borderOffset,
-      rect.top + height / 2 - _cutOutSize / 2 + borderOffset,
+      rect.left + width / 2 -  _cutOutSize / 2 + borderOffset,
+      rect.top + height / 2 - (_cutOutSize/ratio)/ 2 + borderOffset,
       _cutOutSize - borderOffset * 2,
-      _cutOutSize - borderOffset * 2,
+      _cutOutSize/ratio - borderOffset * 2,
     );
 
     canvas
@@ -100,7 +101,7 @@ class QrScannerOverlayShape extends ShapeBorder {
         rect,
         backgroundPaint,
       )
-      // Draw top right corner
+    // Draw top right corner
       ..drawRRect(
         RRect.fromLTRBAndCorners(
           cutOutRect.right - _borderLength,
@@ -111,7 +112,7 @@ class QrScannerOverlayShape extends ShapeBorder {
         ),
         borderPaint,
       )
-      // Draw top left corner
+    // Draw top left corner
       ..drawRRect(
         RRect.fromLTRBAndCorners(
           cutOutRect.left,
@@ -122,7 +123,7 @@ class QrScannerOverlayShape extends ShapeBorder {
         ),
         borderPaint,
       )
-      // Draw bottom right corner
+    // Draw bottom right corner
       ..drawRRect(
         RRect.fromLTRBAndCorners(
           cutOutRect.right - _borderLength,
@@ -133,7 +134,7 @@ class QrScannerOverlayShape extends ShapeBorder {
         ),
         borderPaint,
       )
-      // Draw bottom left corner
+    // Draw bottom left corner
       ..drawRRect(
         RRect.fromLTRBAndCorners(
           cutOutRect.left,
