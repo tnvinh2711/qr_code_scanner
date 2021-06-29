@@ -335,7 +335,7 @@ class QRViewController {
           'width': renderBox.size.width,
           'height': renderBox.size.height,
           'scanArea': overlay?.cutOutSize ?? 0,
-          'scanAreaOffset': overlay?.cutOutBottomOffset ?? 0
+          'scanAreaOffset': 0
         });
         return true;
       } on PlatformException catch (e) {
